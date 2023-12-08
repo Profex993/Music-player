@@ -165,7 +165,7 @@ public class SongPlayer {
         if (mp3Running) {
             return 0;
         } else if (wavPlayer != null) {
-            return wavPlayer.getFramePosition();
+            return (int) (wavPlayer.getFramePosition() / wavPlayer.getFormat().getSampleRate());
         } else {
             return 0;
         }

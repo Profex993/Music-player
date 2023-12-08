@@ -38,21 +38,16 @@ public class PanelMain extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        double interval = 16666666;
-        double delta = 0;
         long last = System.nanoTime();
         long time;
         long timer = 0;
         while (thread != null) {
             time = System.nanoTime();
-            delta += (time - last) / interval;
             timer += (time - last);
             last = time;
-            if (delta >= 1) {
-                delta--;
-            }
-            if (timer >= 1000000000) {
+            if (timer >= 500000000) {
                 timer = 0;
+                timeSlider.setValue(player.getCurrentSOngTime());
             }
         }
     }
