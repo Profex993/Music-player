@@ -11,8 +11,9 @@ public class PanelMain extends JPanel implements Runnable {
     private Thread thread;
     private final SongPlayer player = new SongPlayer();
     private final JLabel title = new JLabel(), creator = new JLabel(), album = new JLabel(), year = new JLabel(), genre = new JLabel();
+    private final JLabel timeLabel = new JLabel();
     private final Panel fileLabelPanel = new Panel();
-    private final JSlider timeSlider = new JSlider(0, 0);
+    private final JSlider timeSlider = new JSlider(0, 0), volumeSlider = new JSlider(JSlider.VERTICAL, 0, 100, 5);
     public BufferedImage defaultCoverImage;
 
     public PanelMain() {
@@ -47,7 +48,11 @@ public class PanelMain extends JPanel implements Runnable {
             last = time;
             if (timer >= 500000000) {
                 timer = 0;
-                timeSlider.setValue(player.getCurrentSOngTime());
+                timeSlider.setValue(player.getCurrentSongTime());
+                if (player.isReady()) {
+                    timeLabel.setText(timeDisplayConversion(timeSlider.getValue()) + "   " + timeDisplayConversion(player.getSongLength()));
+                }
+                System.out.println(volumeSlider.getValue());
             }
         }
     }
@@ -94,6 +99,13 @@ public class PanelMain extends JPanel implements Runnable {
         this.add(switchBackButton);
 
         this.add(timeSlider);
+        this.add(timeLabel);
+        volumeSlider.setPaintTicks(true);
+        volumeSlider.setPaintLabels(true);
+        volumeSlider.setMinorTickSpacing(10);
+        volumeSlider.setMajorTickSpacing(50);
+        volumeSlider.setPreferredSize(new Dimension(50, 100));
+        this.add(volumeSlider);
 
         fileLabelPanel.setLayout(new BoxLayout(fileLabelPanel, BoxLayout.PAGE_AXIS));
         this.add(fileLabelPanel);
@@ -112,8 +124,7 @@ public class PanelMain extends JPanel implements Runnable {
 
     public void setSongLabels() {
         if (player.getCurrentSong() != null) {
-            timeSlider.setMaximum(player.getSongTime());
-            System.out.println(timeSlider.getValue() + "time");
+            timeSlider.setMaximum(player.getSongLength());
             Song song = player.getCurrentSong();
             if (song.title() != null && !song.title().equals("")) {
                 title.setText("Title: " + song.title());
@@ -161,12 +172,14 @@ public class PanelMain extends JPanel implements Runnable {
         player.switchSongNext();
         setSongLabels();
         repaint();
+        timeSlider.setValue(0);
     }
 
     public void switchBackButtonFunction() {
         player.switchSongBack();
         setSongLabels();
         repaint();
+        timeSlider.setValue(0);
     }
 
     public void selectFileButton() {
@@ -179,5 +192,23 @@ public class PanelMain extends JPanel implements Runnable {
             setSongLabels();
             setFileNames();
         }
+    }
+
+    private String timeDisplayConversion(int input) {
+        int minutes = (int) Math.floor((double) input / 60);
+        int seconds = input % 60;
+
+        String output = "";
+
+        if (minutes < 10) {
+            output += 0;
+        }
+        output += minutes + ":";
+        if (seconds < 10) {
+            output += 0;
+        }
+        output += seconds;
+
+        return output;
     }
 }

@@ -18,12 +18,17 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileManager {
     private final String path;
+    Logger logger = Logger.getLogger("org.jaudiotagger");
 
     public FileManager(String file) {
         path = file;
+        logger.setLevel(Level.WARNING);
+        logger.setUseParentHandlers(false);
     }
 
     public void getFiles(ArrayList<Song> songs) {

@@ -1,21 +1,17 @@
 package Main;
 
 import Enums.Format;
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
+import Players.Mp3Player;
+import Players.WavPlayer;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import java.util.ArrayList;
 
 public class SongPlayer {
     private final ArrayList<Song> songs = new ArrayList<>();
-    private Clip wavPlayer;
-    private final BasicPlayer mp3Player = new BasicPlayer();
-    private boolean mp3Running = false;
+    private final WavPlayer wavPlayer = new WavPlayer();
+    private final Mp3Player mp3Player = new Mp3Player();
     private FileManager fileManager;
     private int currentSongIndex = 0;
 
@@ -24,65 +20,33 @@ public class SongPlayer {
         fileManager = new FileManager(file);
         fileManager.getFiles(songs);
         currentSongIndex = 0;
+        setCurrentSong();
         stop();
     }
 
     public void play() {
         if (songs.size() > 0) {
             if (songs.get(currentSongIndex).format() == Format.WAV) {
-                playWav(songs.get(currentSongIndex));
+                mp3Player.stop();
+                wavPlayer.play();
             } else {
-                playMp3(songs.get(currentSongIndex));
-            }
-        }
-    }
-
-    public void playWav(Song s) {
-        if (wavPlayer != null) {
-            wavPlayer.stop();
-            wavPlayer.close();
-        }
-        try {
-            stopMp3();
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(s.file().toURI().toURL());
-            wavPlayer = AudioSystem.getClip();
-            wavPlayer.open(audioInputStream);
-            wavPlayer.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void playMp3(Song s) {
-        try {
-            if (wavPlayer != null && wavPlayer.isRunning()) {
                 wavPlayer.stop();
-                wavPlayer.close();
+                mp3Player.play();
             }
-            stopMp3();
-            mp3Player.open(s.file());
-            mp3Player.play();
-            mp3Running = true;
-        } catch (BasicPlayerException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public void stopMp3() {
-        mp3Running = false;
-        try {
-            mp3Player.stop();
-        } catch (BasicPlayerException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void pauseMp3() {
-        mp3Running = false;
-        try {
-            mp3Player.pause();
-        } catch (BasicPlayerException e) {
-            throw new RuntimeException(e);
+    public void setCurrentSong() {
+        if (songs.size() > 0) {
+            try {
+                if (songs.get(currentSongIndex).format() == Format.WAV) {
+                    wavPlayer.setSong(songs.get(currentSongIndex));
+                } else {
+                    mp3Player.setSong(songs.get(currentSongIndex));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException();
+            }
         }
     }
 
@@ -91,8 +55,8 @@ public class SongPlayer {
         if (currentSongIndex == songs.size()) {
             currentSongIndex = 0;
         }
-
         stop();
+        setCurrentSong();
     }
 
     public void switchSongBack() {
@@ -100,48 +64,31 @@ public class SongPlayer {
         if (currentSongIndex == -1) {
             currentSongIndex = songs.size() - 1;
         }
-
         stop();
+        setCurrentSong();
     }
 
     public void pauseOrPlay() {
-        try {
-            if (wavPlayer != null) {
-                if (wavPlayer.isRunning() && !mp3Running) {
-                    wavPlayer.stop();
-                } else if (!wavPlayer.isRunning() && mp3Running) {
-                    pauseMp3();
-                } else if (!mp3Running && !wavPlayer.isRunning()) {
-                    if (songs.get(currentSongIndex).format() == Format.MP3) {
-                        mp3Player.resume();
-                        mp3Running = true;
-                    } else {
-                        wavPlayer.start();
-                    }
-                }
+        if (songs.get(currentSongIndex).format() == Format.MP3) {
+            if (mp3Player.isRunning()) {
+                mp3Player.pause();
             } else {
-                if (mp3Running) {
-                    pauseMp3();
-                } else {
-                    mp3Player.resume();
-                }
+                mp3Player.resume();
             }
-        } catch (BasicPlayerException e) {
-            throw new RuntimeException(e);
+        } else {
+            if (wavPlayer.isRunning()) {
+                wavPlayer.stop();
+            } else {
+                wavPlayer.play();
+            }
         }
     }
 
     public void stop() {
-        if (wavPlayer != null && wavPlayer.isRunning()) {
+        if (wavPlayer.isRunning()) {
             wavPlayer.stop();
         }
-        if (mp3Running) {
-            try {
-                mp3Player.stop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+        mp3Player.stop();
     }
 
     public Song getCurrentSong() {
@@ -152,26 +99,31 @@ public class SongPlayer {
         }
     }
 
-    public int getSongTime() {
+    public int getSongLength() {
         try {
             AudioFile audioFile = AudioFileIO.read(songs.get(currentSongIndex).file());
             return audioFile.getAudioHeader().getTrackLength();
         } catch (Exception e) {
-            return 0;
+            throw new RuntimeException();
         }
     }
 
-    public int getCurrentSOngTime() {
-        if (mp3Running) {
-            return 0;
-        } else if (wavPlayer != null) {
-            return (int) (wavPlayer.getFramePosition() / wavPlayer.getFormat().getSampleRate());
-        } else {
-            return 0;
+    public int getCurrentSongTime() {
+        if (songs.size() > 0) {
+            if (songs.get(currentSongIndex).format() == Format.MP3) {
+                return mp3Player.currentTime();
+            } else {
+                return wavPlayer.currentTime();
+            }
         }
+        return 0;
     }
 
     public FileManager getFileManager() {
         return fileManager;
+    }
+
+    public boolean isReady() {
+        return songs.size() > 0;
     }
 }
