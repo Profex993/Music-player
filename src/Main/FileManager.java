@@ -5,9 +5,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
-import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
@@ -23,12 +21,16 @@ import java.util.logging.Logger;
 
 public class FileManager {
     private final String path;
+    private final Logger logger = Logger.getLogger("org.jaudiotagger");
 
     public FileManager(String file) {
         path = file;
 
-        //this thing makes the annoying console logging to stop... I found it on StackOverflow.com
-        Logger logger = Logger.getLogger("org.jaudiotagger");
+        setupLogger();
+    }
+
+    public void setupLogger() {
+        //this code makes the annoying console logging to stop... I found it on StackOverflow.com
         logger.setLevel(Level.WARNING);
         logger.setUseParentHandlers(false);
     }
@@ -76,9 +78,7 @@ public class FileManager {
                 year = metadata.get("xmpDM:releaseDate");
                 genre = metadata.get("xmpDM:genre");
 
-                AudioFile audioFile = AudioFileIO.read(file);
-                Tag tag = audioFile.getTag();
-                Artwork art = tag.getFirstArtwork();
+                Artwork art = AudioFileIO.read(file).getTag().getFirstArtwork();
                 BufferedImage image = null;
                 if (art != null) {
                     image = (BufferedImage) art.getImage();

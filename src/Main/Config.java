@@ -40,12 +40,13 @@ public class Config {
             File folder = new File("./UserData");
             boolean test = folder.mkdirs();
             if (test) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-                bw.write(String.valueOf(50));
-                bw.newLine();
-                bw.write("");
-                bw.close();
+                Main.dialogWindow("UserData folder restored.");
             }
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            bw.write(String.valueOf(50));
+            bw.newLine();
+            bw.write("");
+            bw.close();
         } catch (IOException e) {
             Main.dialogWindow("Error while restoring config.txt");
         }
