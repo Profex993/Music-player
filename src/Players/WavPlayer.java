@@ -1,5 +1,6 @@
 package Players;
 
+import Main.Main;
 import Main.Song;
 
 import javax.sound.sampled.AudioInputStream;
@@ -22,7 +23,7 @@ public class WavPlayer {
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
         } catch (Exception e) {
-            throw new RuntimeException();
+            Main.dialogWindow("Player error: wav set song.");
         }
     }
 

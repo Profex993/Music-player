@@ -25,7 +25,7 @@ public class SongPlayer {
     }
 
     public void play() {
-        if (songs.size() > 0) {
+        if (!songs.isEmpty()) {
             if (songs.get(currentSongIndex).format() == Format.WAV) {
                 mp3Player.stop();
                 wavPlayer.play();
@@ -37,15 +37,11 @@ public class SongPlayer {
     }
 
     public void setCurrentSong() {
-        if (songs.size() > 0) {
-            try {
-                if (songs.get(currentSongIndex).format() == Format.WAV) {
-                    wavPlayer.setSong(songs.get(currentSongIndex));
-                } else {
-                    mp3Player.setSong(songs.get(currentSongIndex));
-                }
-            } catch (Exception e) {
-                throw new RuntimeException();
+        if (!songs.isEmpty()) {
+            if (songs.get(currentSongIndex).format() == Format.WAV) {
+                wavPlayer.setSong(songs.get(currentSongIndex));
+            } else {
+                mp3Player.setSong(songs.get(currentSongIndex));
             }
         }
     }
@@ -92,7 +88,7 @@ public class SongPlayer {
     }
 
     public Song getCurrentSong() {
-        if (songs.size() > 0) {
+        if (!songs.isEmpty()) {
             return songs.get(currentSongIndex);
         } else {
             return null;
@@ -104,12 +100,13 @@ public class SongPlayer {
             AudioFile audioFile = AudioFileIO.read(songs.get(currentSongIndex).file());
             return audioFile.getAudioHeader().getTrackLength();
         } catch (Exception e) {
-            throw new RuntimeException();
+            Main.dialogWindow("Player error: song length.");
+            return 0;
         }
     }
 
     public int getCurrentSongTime() {
-        if (songs.size() > 0) {
+        if (!songs.isEmpty()) {
             if (songs.get(currentSongIndex).format() == Format.MP3) {
                 return mp3Player.currentTime();
             } else {
@@ -124,7 +121,7 @@ public class SongPlayer {
     }
 
     public boolean isReady() {
-        return songs.size() > 0;
+        return !songs.isEmpty();
     }
 
     public void setVolume(int input) {

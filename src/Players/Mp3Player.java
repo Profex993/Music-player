@@ -1,5 +1,6 @@
 package Players;
 
+import Main.Main;
 import Main.Song;
 import javazoom.jlgui.basicplayer.BasicPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
@@ -36,6 +37,7 @@ public class Mp3Player implements Runnable {
                 try {
                     Thread.sleep(0);
                 } catch (InterruptedException e) {
+                    Main.dialogWindow("Thread error in mp3 player.");
                     throw new RuntimeException(e);
                 }
             }
@@ -46,6 +48,7 @@ public class Mp3Player implements Runnable {
         try {
             player.open(s.file());
         } catch (BasicPlayerException e) {
+            Main.dialogWindow("Player error: mp3 set song.");
             throw new RuntimeException(e);
         }
     }
@@ -56,6 +59,7 @@ public class Mp3Player implements Runnable {
             player.setGain(currentVolume);
             currentTime = 0;
         } catch (BasicPlayerException e) {
+            Main.dialogWindow("Player error: mp3 play.");
             throw new RuntimeException(e);
         }
     }
@@ -65,6 +69,7 @@ public class Mp3Player implements Runnable {
             currentTime = 0;
             player.stop();
         } catch (BasicPlayerException e) {
+            Main.dialogWindow("Player error: mp3 stop.");
             throw new RuntimeException(e);
         }
     }
@@ -73,6 +78,7 @@ public class Mp3Player implements Runnable {
         try {
             player.pause();
         } catch (BasicPlayerException e) {
+            Main.dialogWindow("Player error: mp3 pause.");
             throw new RuntimeException(e);
         }
     }
@@ -81,6 +87,7 @@ public class Mp3Player implements Runnable {
         try {
             player.resume();
         } catch (BasicPlayerException e) {
+            Main.dialogWindow("Player error: mp3 resume.");
             throw new RuntimeException(e);
         }
     }
@@ -99,7 +106,9 @@ public class Mp3Player implements Runnable {
         try {
             player.setGain(val);
         } catch (BasicPlayerException e) {
-            e.printStackTrace();
+            if (!e.getMessage().equals("Gain control not supported")) {
+                Main.dialogWindow("Error while setting volume.");
+            }
         }
     }
 }

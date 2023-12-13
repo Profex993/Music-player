@@ -38,7 +38,7 @@ public class PanelMain extends JPanel implements Runnable {
         try {
             defaultCoverImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("musicCoverDefault.png")));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Main.dialogWindow("Cannot load resource.");
         }
     }
 
@@ -136,27 +136,27 @@ public class PanelMain extends JPanel implements Runnable {
         if (player.getCurrentSong() != null) {
             timeSlider.setMaximum(player.getSongLength());
             Song song = player.getCurrentSong();
-            if (song.title() != null && !song.title().equals("")) {
+            if (song.title() != null && !song.title().isEmpty()) {
                 title.setText("Title: " + song.title());
             } else {
                 title.setText("");
             }
-            if (song.creator() != null && !song.creator().equals("")) {
+            if (song.creator() != null && !song.creator().isEmpty()) {
                 creator.setText("Creator: " + song.creator());
             } else {
                 creator.setText("");
             }
-            if (song.album() != null && !song.album().equals("")) {
+            if (song.album() != null && !song.album().isEmpty()) {
                 album.setText("Album: " + song.album());
             } else {
                 album.setText("");
             }
-            if (song.year() != null && !song.year().equals("")) {
+            if (song.year() != null && !song.year().isEmpty()) {
                 year.setText("Year: " + song.year());
             } else {
                 year.setText("");
             }
-            if (song.genre() != null && !song.genre().equals("")) {
+            if (song.genre() != null && !song.genre().isEmpty()) {
                 genre.setText("Genre: " + song.genre());
             } else {
                 genre.setText("");

@@ -23,10 +23,12 @@ import java.util.logging.Logger;
 
 public class FileManager {
     private final String path;
-    Logger logger = Logger.getLogger("org.jaudiotagger");
 
     public FileManager(String file) {
         path = file;
+
+        //this thing makes the annoying console logging to stop... I found it on StackOverflow.com
+        Logger logger = Logger.getLogger("org.jaudiotagger");
         logger.setLevel(Level.WARNING);
         logger.setUseParentHandlers(false);
     }
@@ -37,18 +39,20 @@ public class FileManager {
         for (int i = 0; i < dirLength; i++) {
             try {
                 String temp = path + "/" + (Objects.requireNonNull(dir.list()))[i];
-                Song s;
+                Song s = null;
                 if ((Objects.requireNonNull(dir.list()))[i].matches("[A-Za-z ]*.wav")) {
                     s = getSong(new File(temp), Format.WAV);
-                    songs.add(s);
                 } else if ((Objects.requireNonNull(dir.list()))[i].matches("[A-Za-z ]*.mp3")) {
                     s = getSong(new File(temp), Format.MP3);
-                    songs.add(s);
                 } else if (!(Objects.requireNonNull(dir.list()))[i].matches(".*.jpg")) {
-                    throw new RuntimeException("unknown format");
+                    Main.dialogWindow("Unsupported file: " + Objects.requireNonNull(dir.list())[i]);
+                }
+
+                if (songs != null) {
+                    songs.add(s);
                 }
             } catch (Exception e) {
-                System.out.println("Unsupported file");
+                Main.dialogWindow("Error while loading files.");
             }
         }
     }
@@ -83,15 +87,16 @@ public class FileManager {
                 return new Song(file, format, image, name, creator, album, year, genre);
 
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Main.dialogWindow("Error while loading metadata.");
             }
         } else {
             try {
                 return new Song(file, format, null, file.getName().replace(".wav", ""), "", "", "", "");
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Main.dialogWindow("Error while loading metadata.");
             }
         }
+        return null;
     }
 
     public ArrayList<String> getSongNames() {

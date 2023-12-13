@@ -26,7 +26,7 @@ public class Config {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             bw.write(String.valueOf(volume));
             bw.newLine();
-            if (!filePath.equals("")) {
+            if (!filePath.isEmpty()) {
                 bw.write(filePath);
             }
             bw.close();
@@ -47,7 +47,7 @@ public class Config {
                 bw.close();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Main.dialogWindow("Error while restoring config.txt");
         }
     }
 }

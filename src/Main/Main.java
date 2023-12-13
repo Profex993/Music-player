@@ -20,4 +20,8 @@ public class Main {
         window.setVisible(true);
         window.pack();
     }
+
+    public static void dialogWindow(String message) {
+        JOptionPane.showMessageDialog(null, message);
+    }
 }
