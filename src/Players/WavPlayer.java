@@ -9,6 +9,7 @@ import javax.sound.sampled.FloatControl;
 
 public class WavPlayer {
     private Clip clip;
+    private float currentVolume = -20.0f;
 
     public WavPlayer() {
     }
@@ -20,7 +21,6 @@ public class WavPlayer {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(song.file().toURI().toURL());
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
-            setVolume();
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -28,6 +28,8 @@ public class WavPlayer {
 
     public void play() {
         clip.start();
+        FloatControl fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        fc.setValue(currentVolume);
     }
 
     public void stop() {
@@ -48,9 +50,16 @@ public class WavPlayer {
         }
     }
 
-    public void setVolume() {
+    public void setVolume(int input) {
         //maximum 6.0 minimum -80.0
-        FloatControl fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        fc.setValue(6.0f);
+        float val = -80.0f;
+        if (input != 0) {
+            val = (float) (-40.0 + ((6.0 - (-40.0)) * (input) / 100));
+        }
+        currentVolume = val;
+        if (clip != null) {
+            FloatControl fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            fc.setValue(val);
+        }
     }
 }

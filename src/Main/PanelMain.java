@@ -9,18 +9,23 @@ import java.util.Objects;
 
 public class PanelMain extends JPanel implements Runnable {
     private Thread thread;
-    private final SongPlayer player = new SongPlayer();
+    private final SongPlayer player;
     private final JLabel title = new JLabel(), creator = new JLabel(), album = new JLabel(), year = new JLabel(), genre = new JLabel();
     private final JLabel timeLabel = new JLabel();
     private final Panel fileLabelPanel = new Panel();
-    private final JSlider timeSlider = new JSlider(0, 0), volumeSlider = new JSlider(JSlider.VERTICAL, 0, 100, 5);
+    private final JSlider timeSlider = new JSlider(0, 0), volumeSlider;
     public BufferedImage defaultCoverImage;
+    private int currentVolume = 0;
+    private String filePath = "";
 
     public PanelMain() {
         this.setPreferredSize(new Dimension(600, 500));
         this.setFocusable(true);
+        player = new SongPlayer();
+        volumeSlider = new JSlider(JSlider.VERTICAL, 0, 100, 50);
         setComponents();
         getRes();
+        Config.load(this);
         startThread();
     }
 
@@ -52,7 +57,12 @@ public class PanelMain extends JPanel implements Runnable {
                 if (player.isReady()) {
                     timeLabel.setText(timeDisplayConversion(timeSlider.getValue()) + "   " + timeDisplayConversion(player.getSongLength()));
                 }
-                System.out.println(volumeSlider.getValue());
+            }
+
+            if (getVolume() != currentVolume && player.isReady()) {
+                player.setVolume(getVolume());
+                currentVolume = getVolume();
+                Config.save(currentVolume, filePath);
             }
         }
     }
@@ -187,10 +197,12 @@ public class PanelMain extends JPanel implements Runnable {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int result = fileChooser.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
-            player.getSongs(fileChooser.getSelectedFile().getAbsolutePath());
+            filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            player.getSongs(filePath);
             repaint();
             setSongLabels();
             setFileNames();
+            Config.save(currentVolume, filePath);
         }
     }
 
@@ -210,5 +222,21 @@ public class PanelMain extends JPanel implements Runnable {
         output += seconds;
 
         return output;
+    }
+
+    public int getVolume() {
+        return volumeSlider.getValue();
+    }
+
+    public void setCurrentVolume(int val) {
+        volumeSlider.setValue(val);
+    }
+
+    public void setFolder(String path) {
+        player.getSongs(path);
+        filePath = path;
+        repaint();
+        setSongLabels();
+        setFileNames();
     }
 }

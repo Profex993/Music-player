@@ -126,4 +126,9 @@ public class SongPlayer {
     public boolean isReady() {
         return songs.size() > 0;
     }
+
+    public void setVolume(int input) {
+        wavPlayer.setVolume(input);
+        mp3Player.setVolume(input);
+    }
 }

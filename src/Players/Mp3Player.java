@@ -8,6 +8,7 @@ public class Mp3Player implements Runnable {
     private final BasicPlayer player = new BasicPlayer();
     private Thread thread;
     private int currentTime = 0;
+    private float currentVolume = 0.5f;
 
     public Mp3Player() {
         startThread();
@@ -52,7 +53,7 @@ public class Mp3Player implements Runnable {
     public void play() {
         try {
             player.play();
-            setVolume();
+            player.setGain(currentVolume);
             currentTime = 0;
         } catch (BasicPlayerException e) {
             throw new RuntimeException(e);
@@ -92,9 +93,11 @@ public class Mp3Player implements Runnable {
         return player.getStatus() == BasicPlayer.PLAYING;
     }
 
-    public void setVolume() {
+    public void setVolume(int input) {
+        float val = (float) input / 100;
+        currentVolume = val;
         try {
-            player.setGain(1.0);
+            player.setGain(val);
         } catch (BasicPlayerException e) {
             e.printStackTrace();
         }
