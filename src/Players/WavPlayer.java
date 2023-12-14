@@ -40,7 +40,11 @@ public class WavPlayer {
     }
 
     public int currentTime() {
-        return (int) (clip.getFramePosition() / clip.getFormat().getSampleRate());
+        if (clip != null) {
+            return (int) (clip.getFramePosition() / clip.getFormat().getSampleRate());
+        } else {
+            return 0;
+        }
     }
 
     public boolean isRunning() {

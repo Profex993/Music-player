@@ -11,9 +11,10 @@ public class PanelMain extends JPanel implements Runnable {
     private Thread thread;
     private final SongPlayer player;
     private final JLabel title = new JLabel(), creator = new JLabel(), album = new JLabel(), year = new JLabel(), genre = new JLabel();
-    private final JLabel timeLabel = new JLabel();
-    private final Panel fileLabelPanel = new Panel();
+    private final JLabel timeLabel = new JLabel(), imageLabel = new JLabel();
+    private final JPanel fileLabelPanel = new JPanel();
     private final JSlider timeSlider = new JSlider(0, 0), volumeSlider;
+    private final JButton pauseButton = new JButton("Pause");
     public BufferedImage defaultCoverImage;
     private int currentVolume = 0;
     private String filePath = "";
@@ -23,8 +24,8 @@ public class PanelMain extends JPanel implements Runnable {
         this.setFocusable(true);
         player = new SongPlayer();
         volumeSlider = new JSlider(JSlider.VERTICAL, 0, 100, 50);
-        setComponents();
         getRes();
+        setComponents();
         Config.load(this);
         startThread();
     }
@@ -67,67 +68,78 @@ public class PanelMain extends JPanel implements Runnable {
         }
     }
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (player.getCurrentSong() != null && player.getCurrentSong().art() != null) {
-            g.drawImage(player.getCurrentSong().art(), 175, 250, 250, 250, this);
-        } else {
-            g.drawImage(defaultCoverImage, 175, 250, 250, 250, this);
-        }
-    }
-
     public void setComponents() {
-        repaint();
-        JButton fileButton = new JButton();
-        fileButton.setText("Select folder");
+        this.setLayout(new BorderLayout());
+
+        JPanel controlPanel = new JPanel();
+        JPanel fileControlPanel = new JPanel();
+        JPanel leftPanel = new JPanel();
+        JPanel imagePanel = new JPanel();
+        JPanel labelPanel = new JPanel();
+
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        fileControlPanel.setLayout(new BoxLayout(fileControlPanel, BoxLayout.X_AXIS));
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+        fileLabelPanel.setLayout(new BoxLayout(fileLabelPanel, BoxLayout.PAGE_AXIS));
+
+        ImageIcon icon = new ImageIcon(defaultCoverImage);
+        Image scaledImage = icon.getImage().getScaledInstance(300, 300, Image.SCALE_DEFAULT);
+        imageLabel.setIcon(new ImageIcon(scaledImage));
+
+        imageLabel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 10));
+        fileLabelPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
+        labelPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
+        controlPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
+        this.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
+
+        JButton fileButton = new JButton("Select folder");
         fileButton.addActionListener(e -> selectFileButton());
-        this.add(fileButton);
 
-        JButton playButton = new JButton();
-        playButton.setText("play");
-        playButton.addActionListener(e -> player.play());
-        this.add(playButton);
-
-        JButton pauseButton = new JButton();
-        pauseButton.setText("Pause");
-        pauseButton.addActionListener(e -> player.pauseOrPlay());
-        this.add(pauseButton);
-
-        JButton stopButton = new JButton();
-        stopButton.setText("Stop");
-        stopButton.addActionListener(e -> player.stop());
-        this.add(stopButton);
-
-        JButton switchButton = new JButton();
-        switchButton.setText("Switch next");
+        JButton switchButton = new JButton("Switch next");
         switchButton.addActionListener(e -> switchButtonFunction());
-        this.add(switchButton);
 
-        JButton switchBackButton = new JButton();
-        switchBackButton.setText("Switch back");
+        JButton switchBackButton = new JButton("Switch back");
         switchBackButton.addActionListener(e -> switchBackButtonFunction());
-        this.add(switchBackButton);
 
-        this.add(timeSlider);
-        this.add(timeLabel);
+        JButton playButton = new JButton("Play");
+        playButton.addActionListener(e -> player.play());
+
+        pauseButton.addActionListener(e -> pauseButtonFunction());
+
+        JButton stopButton = new JButton("Stop");
+        stopButton.addActionListener(e -> player.stop());
+
         volumeSlider.setPaintTicks(true);
         volumeSlider.setPaintLabels(true);
         volumeSlider.setMinorTickSpacing(10);
         volumeSlider.setMajorTickSpacing(50);
         volumeSlider.setPreferredSize(new Dimension(50, 100));
-        this.add(volumeSlider);
 
-        fileLabelPanel.setLayout(new BoxLayout(fileLabelPanel, BoxLayout.PAGE_AXIS));
-        this.add(fileLabelPanel);
-
-        Panel labelPanel = new Panel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
         labelPanel.add(title);
         labelPanel.add(creator);
         labelPanel.add(album);
         labelPanel.add(year);
         labelPanel.add(genre);
-        this.add(labelPanel);
+
+        controlPanel.add(playButton);
+        controlPanel.add(pauseButton);
+        controlPanel.add(stopButton);
+
+        fileControlPanel.add(fileButton);
+        fileControlPanel.add(switchButton);
+        fileControlPanel.add(switchBackButton);
+
+        controlPanel.add(timeSlider);
+        controlPanel.add(timeLabel);
+        controlPanel.add(volumeSlider);
+        imagePanel.add(imageLabel);
+        leftPanel.add(fileLabelPanel);
+        leftPanel.add(labelPanel);
+
+        this.add(leftPanel, BorderLayout.LINE_START);
+        this.add(fileControlPanel, BorderLayout.PAGE_START);
+        this.add(controlPanel, BorderLayout.PAGE_END);
+        this.add(imagePanel, BorderLayout.LINE_END);
 
         setSongLabels();
     }
@@ -161,6 +173,16 @@ public class PanelMain extends JPanel implements Runnable {
             } else {
                 genre.setText("");
             }
+
+            if (song.art() != null) {
+                ImageIcon icon = new ImageIcon(song.art());
+                Image scaledImage = icon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+                imageLabel.setIcon(new ImageIcon(scaledImage));
+            } else {
+                ImageIcon icon = new ImageIcon(defaultCoverImage);
+                Image scaledImage = icon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+                imageLabel.setIcon(new ImageIcon(scaledImage));
+            }
         }
     }
 
@@ -181,14 +203,12 @@ public class PanelMain extends JPanel implements Runnable {
     public void switchButtonFunction() {
         player.switchSongNext();
         setSongLabels();
-        repaint();
         timeSlider.setValue(0);
     }
 
     public void switchBackButtonFunction() {
         player.switchSongBack();
         setSongLabels();
-        repaint();
         timeSlider.setValue(0);
     }
 
@@ -199,10 +219,20 @@ public class PanelMain extends JPanel implements Runnable {
         if (result == JFileChooser.APPROVE_OPTION) {
             filePath = fileChooser.getSelectedFile().getAbsolutePath();
             player.getSongs(filePath);
-            repaint();
             setSongLabels();
             setFileNames();
             Config.save(currentVolume, filePath);
+        }
+    }
+
+    public void pauseButtonFunction() {
+        if (player.isReady()) {
+            if (player.isPlaying()) {
+                pauseButton.setText("Resume");
+            } else {
+                pauseButton.setText("Pause");
+            }
+            player.pauseOrPlay();
         }
     }
 
@@ -235,7 +265,6 @@ public class PanelMain extends JPanel implements Runnable {
     public void setFolder(String path) {
         player.getSongs(path);
         filePath = path;
-        repaint();
         setSongLabels();
         setFileNames();
     }
