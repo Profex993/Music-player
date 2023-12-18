@@ -47,7 +47,7 @@ public class Mp3Player implements Runnable {
     public void setSong(Song s) {
         try {
             player.open(s.file());
-        } catch (BasicPlayerException e) {
+        } catch (Exception e) {
             Main.dialogWindow("Player error: mp3 set song.");
             throw new RuntimeException(e);
         }
@@ -109,6 +109,17 @@ public class Mp3Player implements Runnable {
             if (!e.getMessage().equals("Gain control not supported")) {
                 Main.dialogWindow("Error while setting volume.");
             }
+        }
+    }
+
+    public void setTime(int newTime) {
+        try {
+            long skipTime = newTime * 16000L;
+            currentTime = newTime;
+            player.seek(skipTime);
+            player.setGain(currentVolume);
+        } catch (BasicPlayerException e) {
+            Main.dialogWindow("Error while setting time.");
         }
     }
 }

@@ -49,6 +49,7 @@ public class PanelMain extends JPanel implements Runnable {
         long time;
         long timer = 0;
         while (thread != null) {
+
             time = System.nanoTime();
             timer += (time - last);
             last = time;
@@ -58,12 +59,6 @@ public class PanelMain extends JPanel implements Runnable {
                 if (player.isReady()) {
                     timeLabel.setText(timeDisplayConversion(timeSlider.getValue()) + "   " + timeDisplayConversion(player.getSongLength()));
                 }
-            }
-
-            if (getVolume() != currentVolume && player.isReady()) {
-                player.setVolume(getVolume());
-                currentVolume = getVolume();
-                Config.save(currentVolume, filePath);
             }
         }
     }
@@ -82,9 +77,19 @@ public class PanelMain extends JPanel implements Runnable {
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
         fileLabelPanel.setLayout(new BoxLayout(fileLabelPanel, BoxLayout.PAGE_AXIS));
 
+        labelPanel.setPreferredSize(new Dimension(170, 100));
+
         ImageIcon icon = new ImageIcon(defaultCoverImage);
         Image scaledImage = icon.getImage().getScaledInstance(300, 300, Image.SCALE_DEFAULT);
         imageLabel.setIcon(new ImageIcon(scaledImage));
+
+        timeSlider.addChangeListener(e -> {
+            if (!timeSlider.getValueIsAdjusting()) {
+                if (timeSlider.getValue() != player.getCurrentSongTime()) {
+                    player.setTime(timeSlider.getValue());
+                }
+            }
+        });
 
         imageLabel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 10));
         fileLabelPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
@@ -95,10 +100,10 @@ public class PanelMain extends JPanel implements Runnable {
         JButton fileButton = new JButton("Select folder");
         fileButton.addActionListener(e -> selectFileButton());
 
-        JButton switchButton = new JButton("Switch next");
+        JButton switchButton = new JButton(">>>");
         switchButton.addActionListener(e -> switchButtonFunction());
 
-        JButton switchBackButton = new JButton("Switch back");
+        JButton switchBackButton = new JButton("<<<");
         switchBackButton.addActionListener(e -> switchBackButtonFunction());
 
         JButton playButton = new JButton("Play");
@@ -114,6 +119,15 @@ public class PanelMain extends JPanel implements Runnable {
         volumeSlider.setMinorTickSpacing(10);
         volumeSlider.setMajorTickSpacing(50);
         volumeSlider.setPreferredSize(new Dimension(50, 100));
+        volumeSlider.addChangeListener(e -> {
+            if (!volumeSlider.getValueIsAdjusting()) {
+                if (volumeSlider.getValue() != currentVolume && player.isReady()) {
+                    player.setVolume(getVolume());
+                    currentVolume = getVolume();
+                    Config.save(currentVolume, filePath);
+                }
+            }
+        });
 
         labelPanel.add(title);
         labelPanel.add(creator);
@@ -126,8 +140,8 @@ public class PanelMain extends JPanel implements Runnable {
         controlPanel.add(stopButton);
 
         fileControlPanel.add(fileButton);
-        fileControlPanel.add(switchButton);
         fileControlPanel.add(switchBackButton);
+        fileControlPanel.add(switchButton);
 
         controlPanel.add(timeSlider);
         controlPanel.add(timeLabel);
@@ -146,6 +160,7 @@ public class PanelMain extends JPanel implements Runnable {
 
     public void setSongLabels() {
         if (player.getCurrentSong() != null) {
+            pauseButton.setText("Pause");
             timeSlider.setMaximum(player.getSongLength());
             Song song = player.getCurrentSong();
             if (song.title() != null && !song.title().isEmpty()) {
@@ -194,9 +209,17 @@ public class PanelMain extends JPanel implements Runnable {
         } else {
             labels = new String[0];
         }
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
+        JScrollPane scrollPane = new JScrollPane(labelPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        fileLabelPanel.add(scrollPane);
+        fileLabelPanel.setPreferredSize(new Dimension(170, 400));
+
         for (int i = 0; i < labels.length; i++) {
             JLabel label = new JLabel(i + 1 + ". " + labels[i]);
-            fileLabelPanel.add(label);
+            labelPanel.add(label);
         }
     }
 
@@ -260,6 +283,7 @@ public class PanelMain extends JPanel implements Runnable {
 
     public void setCurrentVolume(int val) {
         volumeSlider.setValue(val);
+        player.setVolume(val);
     }
 
     public void setFolder(String path) {

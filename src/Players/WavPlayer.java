@@ -12,8 +12,6 @@ public class WavPlayer {
     private Clip clip;
     private float currentVolume = -20.0f;
 
-    public WavPlayer() {
-    }
     public void setSong(Song song) {
         try {
             if (clip != null) {
@@ -66,5 +64,9 @@ public class WavPlayer {
             FloatControl fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             fc.setValue(val);
         }
+    }
+
+    public void setTime(int newTime) {
+        clip.setFramePosition((int) clip.getFormat().getSampleRate() * newTime);
     }
 }

@@ -7,7 +7,6 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.images.Artwork;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.awt.image.BufferedImage;
@@ -42,11 +41,11 @@ public class FileManager {
             try {
                 String temp = path + "/" + (Objects.requireNonNull(dir.list()))[i];
                 Song s = null;
-                if ((Objects.requireNonNull(dir.list()))[i].matches("[A-Za-z ]*.wav")) {
+                if ((Objects.requireNonNull(dir.list()))[i].matches(".*.wav")) {
                     s = getSong(new File(temp), Format.WAV);
-                } else if ((Objects.requireNonNull(dir.list()))[i].matches("[A-Za-z ]*.mp3")) {
+                } else if ((Objects.requireNonNull(dir.list()))[i].matches(".*.mp3")) {
                     s = getSong(new File(temp), Format.MP3);
-                } else if (!(Objects.requireNonNull(dir.list()))[i].matches(".*.jpg")) {
+                } else {
                     Main.dialogWindow("Unsupported file: " + Objects.requireNonNull(dir.list())[i]);
                 }
 
@@ -65,11 +64,9 @@ public class FileManager {
         if (format == Format.MP3) {
             try {
                 InputStream input = new FileInputStream(file.getPath());
-                ContentHandler handler = new DefaultHandler();
                 Metadata metadata = new Metadata();
                 Parser parser = new Mp3Parser();
-                ParseContext parseCtx = new ParseContext();
-                parser.parse(input, handler, metadata, parseCtx);
+                parser.parse(input, new DefaultHandler(), metadata, new ParseContext());
                 input.close();
 
                 name = metadata.get(Metadata.TITLE);

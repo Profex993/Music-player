@@ -132,4 +132,13 @@ public class SongPlayer {
         wavPlayer.setVolume(input);
         mp3Player.setVolume(input);
     }
+
+    public void setTime(int input) {
+        if (wavPlayer.isRunning()) {
+            wavPlayer.setTime(input);
+        }
+        if (mp3Player.isRunning()) {
+            mp3Player.setTime(input);
+        }
+    }
 }
