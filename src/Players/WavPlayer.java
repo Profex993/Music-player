@@ -21,7 +21,7 @@ public class WavPlayer {
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
         } catch (Exception e) {
-            Main.dialogWindow("Player error: wav set song.");
+            Main.openDialogWindow("Player error: wav set song.");
         }
     }
 

@@ -37,7 +37,7 @@ public class Mp3Player implements Runnable {
                 try {
                     Thread.sleep(0);
                 } catch (InterruptedException e) {
-                    Main.dialogWindow("Thread error in mp3 player.");
+                    Main.openDialogWindow("Thread error in mp3 player.");
                     throw new RuntimeException(e);
                 }
             }
@@ -48,7 +48,7 @@ public class Mp3Player implements Runnable {
         try {
             player.open(s.file());
         } catch (Exception e) {
-            Main.dialogWindow("Player error: mp3 set song.");
+            Main.openDialogWindow("Player error: mp3 set song.");
             throw new RuntimeException(e);
         }
     }
@@ -59,7 +59,7 @@ public class Mp3Player implements Runnable {
             player.setGain(currentVolume);
             currentTime = 0;
         } catch (BasicPlayerException e) {
-            Main.dialogWindow("Player error: mp3 play.");
+            Main.openDialogWindow("Player error: mp3 play.");
             throw new RuntimeException(e);
         }
     }
@@ -69,7 +69,7 @@ public class Mp3Player implements Runnable {
             currentTime = 0;
             player.stop();
         } catch (BasicPlayerException e) {
-            Main.dialogWindow("Player error: mp3 stop.");
+            Main.openDialogWindow("Player error: mp3 stop.");
             throw new RuntimeException(e);
         }
     }
@@ -78,7 +78,7 @@ public class Mp3Player implements Runnable {
         try {
             player.pause();
         } catch (BasicPlayerException e) {
-            Main.dialogWindow("Player error: mp3 pause.");
+            Main.openDialogWindow("Player error: mp3 pause.");
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +87,7 @@ public class Mp3Player implements Runnable {
         try {
             player.resume();
         } catch (BasicPlayerException e) {
-            Main.dialogWindow("Player error: mp3 resume.");
+            Main.openDialogWindow("Player error: mp3 resume.");
             throw new RuntimeException(e);
         }
     }
@@ -107,7 +107,7 @@ public class Mp3Player implements Runnable {
             player.setGain(val);
         } catch (BasicPlayerException e) {
             if (!e.getMessage().equals("Gain control not supported")) {
-                Main.dialogWindow("Error while setting volume.");
+                Main.openDialogWindow("Error while setting volume.");
             }
         }
     }
@@ -119,7 +119,7 @@ public class Mp3Player implements Runnable {
             player.seek(skipTime);
             player.setGain(currentVolume);
         } catch (BasicPlayerException e) {
-            Main.dialogWindow("Error while setting time.");
+            Main.openDialogWindow("Error while setting time.");
         }
     }
 }

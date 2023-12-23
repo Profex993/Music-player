@@ -8,7 +8,6 @@ public class Main {
     }
 
     public static void startWindow() {
-
         JFrame window = new JFrame();
         window.setTitle("Music Player");
 
@@ -21,7 +20,7 @@ public class Main {
         window.pack();
     }
 
-    public static void dialogWindow(String message) {
+    public static void openDialogWindow(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
 }

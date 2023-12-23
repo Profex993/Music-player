@@ -19,11 +19,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileManager {
-    private final String path;
+    private final String filePath;
     private final Logger logger = Logger.getLogger("org.jaudiotagger");
 
     public FileManager(String file) {
-        path = file;
+        filePath = file;
 
         setupLogger();
     }
@@ -35,25 +35,25 @@ public class FileManager {
     }
 
     public void getFiles(ArrayList<Song> songs) {
-        File dir = new File(path);
+        File dir = new File(filePath);
         int dirLength = Objects.requireNonNull(dir.list()).length;
         for (int i = 0; i < dirLength; i++) {
             try {
-                String temp = path + "/" + (Objects.requireNonNull(dir.list()))[i];
+                String temp = filePath + "/" + (Objects.requireNonNull(dir.list()))[i];
                 Song s = null;
                 if ((Objects.requireNonNull(dir.list()))[i].matches(".*.wav")) {
                     s = getSong(new File(temp), Format.WAV);
                 } else if ((Objects.requireNonNull(dir.list()))[i].matches(".*.mp3")) {
                     s = getSong(new File(temp), Format.MP3);
                 } else {
-                    Main.dialogWindow("Unsupported file: " + Objects.requireNonNull(dir.list())[i]);
+                    Main.openDialogWindow("Unsupported file: " + Objects.requireNonNull(dir.list())[i]);
                 }
 
                 if (songs != null) {
                     songs.add(s);
                 }
             } catch (Exception e) {
-                Main.dialogWindow("Error while loading files.");
+                Main.openDialogWindow("Error while loading files.");
             }
         }
     }
@@ -84,20 +84,20 @@ public class FileManager {
                 return new Song(file, format, image, name, creator, album, year, genre);
 
             } catch (Exception e) {
-                Main.dialogWindow("Error while loading metadata.");
+                Main.openDialogWindow("Error while loading metadata.");
             }
         } else {
             try {
                 return new Song(file, format, null, file.getName().replace(".wav", ""), "", "", "", "");
             } catch (Exception e) {
-                Main.dialogWindow("Error while loading metadata.");
+                Main.openDialogWindow("Error while loading metadata.");
             }
         }
         return null;
     }
 
     public ArrayList<String> getSongNames() {
-        File dir = new File(path);
+        File dir = new File(filePath);
         int dirLength = Objects.requireNonNull(dir.list()).length;
         ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < dirLength; i++) {

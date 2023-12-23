@@ -16,10 +16,10 @@ public class SongPlayer {
     private int currentSongIndex = 0;
 
     public void getSongs(String file) {
+        currentSongIndex = 0;
         songs.clear();
         fileManager = new FileManager(file);
         fileManager.getFiles(songs);
-        currentSongIndex = 0;
         setCurrentSong();
         stop();
     }
@@ -37,7 +37,7 @@ public class SongPlayer {
     }
 
     public void setCurrentSong() {
-        if (!songs.isEmpty()) {
+        if (!songs.isEmpty() && songs.size() > currentSongIndex) {
             if (songs.get(currentSongIndex).format() == Format.WAV) {
                 wavPlayer.setSong(songs.get(currentSongIndex));
             } else {
@@ -100,13 +100,13 @@ public class SongPlayer {
             AudioFile audioFile = AudioFileIO.read(songs.get(currentSongIndex).file());
             return audioFile.getAudioHeader().getTrackLength();
         } catch (Exception e) {
-            Main.dialogWindow("Player error: song length.");
+            Main.openDialogWindow("Player error: song length.");
             return 0;
         }
     }
 
     public int getCurrentSongTime() {
-        if (!songs.isEmpty()) {
+        if (!songs.isEmpty() && songs.size() > currentSongIndex) {
             if (songs.get(currentSongIndex).format() == Format.MP3) {
                 return mp3Player.currentTime();
             } else {
