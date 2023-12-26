@@ -119,7 +119,7 @@ public class PanelMain extends JPanel implements Runnable {
         pauseButton.addActionListener(e -> pauseButtonFunction());
 
         JButton stopButton = new JButton("Stop");
-        stopButton.addActionListener(e -> songPlayer.stop());
+        stopButton.addActionListener(e -> stopButtonFunction());
 
         volumeSlider.setPaintTicks(true);
         volumeSlider.setPaintLabels(true);
@@ -264,6 +264,13 @@ public class PanelMain extends JPanel implements Runnable {
             }
             songPlayer.pauseOrPlay();
         }
+    }
+
+    public void stopButtonFunction() {
+        if (songPlayer.isReady() && !songPlayer.isPlaying()) {
+            pauseButtonFunction();
+        }
+        songPlayer.stop();
     }
 
     private String timeDisplayConversion(int input) {
