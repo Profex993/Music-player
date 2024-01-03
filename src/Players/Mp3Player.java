@@ -34,6 +34,8 @@ public class Mp3Player implements Runnable {
                 if (player.getStatus() == BasicPlayer.PLAYING) {
                     currentTime++;
                 }
+
+                //without this the code breaks
                 try {
                     Thread.sleep(0);
                 } catch (InterruptedException e) {

@@ -19,7 +19,7 @@ public class PanelMain extends JPanel implements Runnable {
             timeLabel = new JLabel(),
             imageLabel = new JLabel();
 
-    private final JPanel fileLabelPanel = new JPanel();
+    private final JPanel filePanel = new JPanel();
     private final JSlider timeSlider = new JSlider(0, 0), volumeSlider;
     private final JButton pauseButton = new JButton("Pause");
     public BufferedImage defaultCoverImage;
@@ -70,7 +70,7 @@ public class PanelMain extends JPanel implements Runnable {
         }
     }
 
-    public void setComponents() {
+    private void setComponents() {
         this.setLayout(new BorderLayout());
 
         JPanel controlPanel = new JPanel();
@@ -82,7 +82,7 @@ public class PanelMain extends JPanel implements Runnable {
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         fileControlPanel.setLayout(new BoxLayout(fileControlPanel, BoxLayout.X_AXIS));
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
-        fileLabelPanel.setLayout(new BoxLayout(fileLabelPanel, BoxLayout.PAGE_AXIS));
+        filePanel.setLayout(new BoxLayout(filePanel, BoxLayout.PAGE_AXIS));
 
         labelPanel.setPreferredSize(new Dimension(170, 100));
 
@@ -99,7 +99,7 @@ public class PanelMain extends JPanel implements Runnable {
         });
 
         imageLabel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 10));
-        fileLabelPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
+        filePanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
         labelPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
         controlPanel.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
         this.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
@@ -114,7 +114,7 @@ public class PanelMain extends JPanel implements Runnable {
         switchBackButton.addActionListener(e -> switchBackButtonFunction());
 
         JButton playButton = new JButton("Play");
-        playButton.addActionListener(e -> songPlayer.play());
+        playButton.addActionListener(e -> playButtonFunction());
 
         pauseButton.addActionListener(e -> pauseButtonFunction());
 
@@ -154,7 +154,7 @@ public class PanelMain extends JPanel implements Runnable {
         controlPanel.add(timeLabel);
         controlPanel.add(volumeSlider);
         imagePanel.add(imageLabel);
-        leftPanel.add(fileLabelPanel);
+        leftPanel.add(filePanel);
         leftPanel.add(labelPanel);
 
         this.add(leftPanel, BorderLayout.LINE_START);
@@ -165,7 +165,7 @@ public class PanelMain extends JPanel implements Runnable {
         setCurrentSongLabels();
     }
 
-    public void setCurrentSongLabels() {
+    private void setCurrentSongLabels() {
         if (songPlayer.getCurrentSong() != null) {
             pauseButton.setText("Pause");
             timeSlider.setMaximum(songPlayer.getSongLength());
@@ -208,41 +208,60 @@ public class PanelMain extends JPanel implements Runnable {
         }
     }
 
-    public void setCurrentFileNames() {
-        fileLabelPanel.removeAll();
-        String[] labels;
+    private void setCurrentFileNames() {
+        filePanel.removeAll();
+        String[] songNames;
         if (songPlayer.getFileManager().getSongNames() != null) {
-            labels = songPlayer.getFileManager().getSongNames().toArray(new String[0]);
+            songNames = songPlayer.getFileManager().getSongNames().toArray(new String[0]);
         } else {
-            labels = new String[0];
+            songNames = new String[0];
         }
 
-        JPanel labelPanel = new JPanel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(labelPanel);
+        JPanel songListPanel = new JPanel();
+        songListPanel.setLayout(new BoxLayout(songListPanel, BoxLayout.Y_AXIS));
+        JScrollPane scrollPane = new JScrollPane(songListPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        fileLabelPanel.add(scrollPane);
-        fileLabelPanel.setPreferredSize(new Dimension(170, 400));
+        filePanel.add(scrollPane);
+        filePanel.setPreferredSize(new Dimension(170, 400));
 
-        for (int i = 0; i < labels.length; i++) {
-            JLabel label = new JLabel(i + 1 + ". " + labels[i]);
-            labelPanel.add(label);
+        for (int i = 0; i < songNames.length; i++) {
+            JButton button = new JButton(i + 1 + ". " + songNames[i]);
+            button.setBorder(null);
+            button.setBackground(new Color(238, 238, 238));
+            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            int finalI = i;
+            button.addActionListener(e -> songListButtonFunction(finalI));
+            songListPanel.add(button);
         }
     }
 
-    public void switchNextButtonFunction() {
+    private void songListButtonFunction(int i) {
+        songPlayer.setCurrentSongIndex(i);
+        changeSong();
+    }
+
+    private void switchNextButtonFunction() {
         songPlayer.switchSongNext();
-        setCurrentSongLabels();
-        timeSlider.setValue(0);
+        changeSong();
     }
 
-    public void switchBackButtonFunction() {
+    private void switchBackButtonFunction() {
         songPlayer.switchSongBack();
+        changeSong();
+    }
+
+    private void changeSong() {
         setCurrentSongLabels();
         timeSlider.setValue(0);
     }
 
-    public void selectFileButton() {
+    private void playButtonFunction() {
+        if (!songPlayer.isPlaying()) {
+            songPlayer.play();
+        }
+    }
+
+    private void selectFileButton() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int result = fileChooser.showOpenDialog(null);
@@ -255,7 +274,7 @@ public class PanelMain extends JPanel implements Runnable {
         }
     }
 
-    public void pauseButtonFunction() {
+    private void pauseButtonFunction() {
         if (songPlayer.isReady()) {
             if (songPlayer.isPlaying()) {
                 pauseButton.setText("Resume");
@@ -266,7 +285,7 @@ public class PanelMain extends JPanel implements Runnable {
         }
     }
 
-    public void stopButtonFunction() {
+    private void stopButtonFunction() {
         if (songPlayer.isReady() && !songPlayer.isPlaying()) {
             pauseButtonFunction();
         }
@@ -291,7 +310,7 @@ public class PanelMain extends JPanel implements Runnable {
         return output;
     }
 
-    public int getVolume() {
+    private int getVolume() {
         return volumeSlider.getValue();
     }
 

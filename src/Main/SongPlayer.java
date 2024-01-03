@@ -51,8 +51,7 @@ public class SongPlayer {
         if (currentSongIndex == songs.size()) {
             currentSongIndex = 0;
         }
-        stop();
-        setCurrentSong();
+        changeSong();
     }
 
     public void switchSongBack() {
@@ -60,8 +59,7 @@ public class SongPlayer {
         if (currentSongIndex == -1) {
             currentSongIndex = songs.size() - 1;
         }
-        stop();
-        setCurrentSong();
+        changeSong();
     }
 
     public void pauseOrPlay() {
@@ -140,5 +138,16 @@ public class SongPlayer {
         if (mp3Player.isRunning()) {
             mp3Player.setTime(input);
         }
+    }
+
+    private void changeSong() {
+        stop();
+        setCurrentSong();
+        play();
+    }
+
+    public void setCurrentSongIndex(int i) {
+        currentSongIndex = i;
+        changeSong();
     }
 }
