@@ -4,6 +4,7 @@ import java.io.*;
 
 public class Config {
     private static final String originalFilePath = "./UserData/config.txt";
+    private static final String originalFolderPath = "./UserData";
 
     public static void load(PanelMain panel) {
         try {
@@ -37,7 +38,7 @@ public class Config {
 
     private static void restoreFile() {
         try {
-            File folder = new File("./UserData");
+            File folder = new File(originalFolderPath);
             boolean test = folder.mkdirs();
             if (test) {
                 Main.openDialogWindow("UserData folder restored.");

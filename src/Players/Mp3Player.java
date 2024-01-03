@@ -39,7 +39,7 @@ public class Mp3Player implements Runnable {
                 try {
                     Thread.sleep(0);
                 } catch (InterruptedException e) {
-                    Main.openDialogWindow("Thread error in mp3 player.");
+                    Main.openDialogWindow("Player error: mp3 thread");
                     throw new RuntimeException(e);
                 }
             }
