@@ -9,11 +9,18 @@ import org.jaudiotagger.audio.AudioFileIO;
 import java.util.ArrayList;
 
 public class SongPlayer {
+    private final PanelMain panelMain;
     private final ArrayList<Song> songs = new ArrayList<>();
-    private final WavPlayer wavPlayer = new WavPlayer();
-    private final Mp3Player mp3Player = new Mp3Player();
+    private final WavPlayer wavPlayer = new WavPlayer(this);
+    private final Mp3Player mp3Player = new Mp3Player(this);
     private FileManager fileManager;
     private int currentSongIndex = 0;
+
+    private boolean autoplayEnabled = false, loopEnabled = false;
+
+    public SongPlayer(PanelMain panelMain) {
+        this.panelMain = panelMain;
+    }
 
     public void getSongs(String file) {
         currentSongIndex = 0;
@@ -95,12 +102,14 @@ public class SongPlayer {
 
     public int getSongLength() {
         try {
-            AudioFile audioFile = AudioFileIO.read(songs.get(currentSongIndex).file());
-            return audioFile.getAudioHeader().getTrackLength();
+            if (isReady()) {
+                AudioFile audioFile = AudioFileIO.read(songs.get(currentSongIndex).file());
+                return audioFile.getAudioHeader().getTrackLength();
+            }
         } catch (Exception e) {
             Main.openDialogWindow("Player error: song length.");
-            return 0;
         }
+        return 0;
     }
 
     public int getCurrentSongTime() {
@@ -143,11 +152,38 @@ public class SongPlayer {
     private void changeSong() {
         stop();
         setCurrentSong();
+        panelMain.resetTime();
         play();
     }
 
     public void setCurrentSongIndex(int i) {
         currentSongIndex = i;
         changeSong();
+    }
+
+    public PanelMain getPanelMain() {
+        return panelMain;
+    }
+
+    public boolean isAutoplayEnabled() {
+        return autoplayEnabled;
+    }
+
+    public boolean isLoopEnabled() {
+        return loopEnabled;
+    }
+
+    public void toggleAutoPlay() {
+        autoplayEnabled = !autoplayEnabled;
+        if (autoplayEnabled) {
+            loopEnabled = false;
+        }
+    }
+
+    public void toggleLoopPlay() {
+        loopEnabled = !loopEnabled;
+        if (autoplayEnabled) {
+            autoplayEnabled = false;
+        }
     }
 }

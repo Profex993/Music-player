@@ -2,16 +2,19 @@ package Players;
 
 import Main.Main;
 import Main.Song;
+import Main.SongPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class Mp3Player implements Runnable {
+    private final SongPlayer songPlayer;
     private final BasicPlayer player = new BasicPlayer();
     private Thread thread;
     private int currentTime = 0;
     private float currentVolume = 0.5f;
 
-    public Mp3Player() {
+    public Mp3Player(SongPlayer songPlayer) {
+        this.songPlayer = songPlayer;
         startThread();
     }
 
@@ -31,16 +34,20 @@ public class Mp3Player implements Runnable {
             last = time;
             if (timer >= 1000000000) {
                 timer = 0;
-                if (player.getStatus() == BasicPlayer.PLAYING) {
+                if ((player.getStatus() == BasicPlayer.PLAYING) || player.getStatus() == BasicPlayer.STOPPED
+                        && (songPlayer.isAutoplayEnabled() || songPlayer.isLoopEnabled()) &&
+                        currentTime < songPlayer.getSongLength() + 2) {
                     currentTime++;
-                }
+                } else if (currentTime == songPlayer.getSongLength() + 2 && songPlayer.isAutoplayEnabled()) {
+                    currentTime = 0;
+                    songPlayer.getPanelMain().resetTime();
+                    songPlayer.switchSongNext();
+                    songPlayer.getPanelMain().setCurrentSongLabels();
+                } else if (currentTime == songPlayer.getSongLength() + 2 && songPlayer.isLoopEnabled()) {
+                    currentTime = 0;
+                    songPlayer.getPanelMain().resetTime();
 
-                //without this the code breaks
-                try {
-                    Thread.sleep(0);
-                } catch (InterruptedException e) {
-                    Main.openDialogWindow("Player error: mp3 thread");
-                    throw new RuntimeException(e);
+                    play();
                 }
             }
         }
@@ -103,7 +110,10 @@ public class Mp3Player implements Runnable {
     }
 
     public void setVolume(int input) {
-        float val = (float) input / 100;
+        float val = 0;
+        if (input != 0) {
+            val = (float) input / 100;
+        }
         currentVolume = val;
         try {
             player.setGain(val);

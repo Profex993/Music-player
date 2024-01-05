@@ -21,15 +21,17 @@ public class PanelMain extends JPanel implements Runnable {
 
     private final JPanel filePanel = new JPanel();
     private final JSlider timeSlider = new JSlider(0, 0), volumeSlider;
-    private final JButton pauseButton = new JButton("Pause");
+    private final JButton pauseButton = new JButton("Pause"),
+            loopButton = new JButton("Loop (f)"),
+            autoPlayButton = new JButton("Autoplay (f)");
     public BufferedImage defaultCoverImage;
-    private int currentVolume = 0;
+    private int currentVolume = 50;
     private String currentFilePath = "";
 
     public PanelMain() {
         this.setPreferredSize(new Dimension(600, 500));
         this.setFocusable(true);
-        songPlayer = new SongPlayer();
+        songPlayer = new SongPlayer(this);
         volumeSlider = new JSlider(JSlider.VERTICAL, 0, 100, 50);
         getResource();
         setComponents();
@@ -92,7 +94,7 @@ public class PanelMain extends JPanel implements Runnable {
 
         timeSlider.addChangeListener(e -> {
             if (!timeSlider.getValueIsAdjusting()) {
-                if (timeSlider.getValue() != songPlayer.getCurrentSongTime()) {
+                if (timeSlider.getValue() != songPlayer.getCurrentSongTime() && songPlayer.isReady()) {
                     songPlayer.setTime(timeSlider.getValue());
                 }
             }
@@ -120,6 +122,10 @@ public class PanelMain extends JPanel implements Runnable {
 
         JButton stopButton = new JButton("Stop");
         stopButton.addActionListener(e -> stopButtonFunction());
+
+        autoPlayButton.addActionListener(e -> autoPlayButtonFunction());
+
+        loopButton.addActionListener(e -> loopButtonFunction());
 
         volumeSlider.setPaintTicks(true);
         volumeSlider.setPaintLabels(true);
@@ -149,6 +155,8 @@ public class PanelMain extends JPanel implements Runnable {
         fileControlPanel.add(fileButton);
         fileControlPanel.add(switchBackButton);
         fileControlPanel.add(switchButton);
+        fileControlPanel.add(loopButton);
+        fileControlPanel.add(autoPlayButton);
 
         controlPanel.add(timeSlider);
         controlPanel.add(timeLabel);
@@ -165,7 +173,7 @@ public class PanelMain extends JPanel implements Runnable {
         setCurrentSongLabels();
     }
 
-    private void setCurrentSongLabels() {
+    public void setCurrentSongLabels() {
         if (songPlayer.getCurrentSong() != null) {
             pauseButton.setText("Pause");
             timeSlider.setMaximum(songPlayer.getSongLength());
@@ -208,6 +216,10 @@ public class PanelMain extends JPanel implements Runnable {
         }
     }
 
+    public void resetTime() {
+        timeSlider.setValue(0);
+    }
+
     private void setCurrentFileNames() {
         filePanel.removeAll();
         String[] songNames;
@@ -236,28 +248,50 @@ public class PanelMain extends JPanel implements Runnable {
     }
 
     private void songListButtonFunction(int i) {
+        resetTime();
         songPlayer.setCurrentSongIndex(i);
-        changeSong();
+        setCurrentSongLabels();
     }
 
     private void switchNextButtonFunction() {
+        resetTime();
         songPlayer.switchSongNext();
-        changeSong();
+        setCurrentSongLabels();
     }
 
     private void switchBackButtonFunction() {
+        resetTime();
         songPlayer.switchSongBack();
-        changeSong();
-    }
-
-    private void changeSong() {
         setCurrentSongLabels();
-        timeSlider.setValue(0);
     }
 
     private void playButtonFunction() {
         if (!songPlayer.isPlaying()) {
             songPlayer.play();
+        }
+    }
+
+    private void loopButtonFunction() {
+        songPlayer.toggleLoopPlay();
+        changeControlButtonLabels();
+    }
+
+    private void autoPlayButtonFunction() {
+        songPlayer.toggleAutoPlay();
+        changeControlButtonLabels();
+    }
+
+    private void changeControlButtonLabels() {
+        if (songPlayer.isAutoplayEnabled()) {
+            autoPlayButton.setText("Autoplay (t)");
+        } else {
+            autoPlayButton.setText("Autoplay (f)");
+        }
+
+        if (songPlayer.isLoopEnabled()) {
+            loopButton.setText("Loop (t)");
+        } else {
+            loopButton.setText("Loop (f)");
         }
     }
 
