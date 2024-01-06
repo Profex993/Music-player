@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class PanelMain extends JPanel implements Runnable {
-    private Thread thread;
     private final SongPlayer songPlayer;
     private final JLabel
             metadataTitleLabel = new JLabel(),
@@ -20,13 +19,13 @@ public class PanelMain extends JPanel implements Runnable {
             metadataGenreLabel = new JLabel(),
             timeLabel = new JLabel(),
             imageLabel = new JLabel();
-
     private final JPanel filePanel = new JPanel();
     private final JSlider timeSlider = new JSlider(0, 0), volumeSlider;
     private final JButton pauseButton = new JButton("Pause"),
             loopButton = new JButton("Loop off"),
             autoPlayButton = new JButton("Autoplay off");
     public BufferedImage defaultCoverImage;
+    private Thread thread;
     private int currentVolume = 50, volumeTemp = 0;
     private boolean muted = false;
     private String currentFilePath = "";
