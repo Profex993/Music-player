@@ -1,7 +1,11 @@
 # Music Player by Profex
 
 ## This is my open source music player for my school project.
-### Programed in Java programing language.
+### Programed in Java.
+<br>
+<br>
+
+![image of the Music Player](https://github.com/Profex993/Music-player/assets/68472681/148070a5-d235-4eab-9d82-31c43b12b303)
 <br>
 <br>
 
@@ -9,7 +13,7 @@
 ### Supported file formates: ``` .waw, .mp3 ```.
 ### Metadata reader + album cover for ``` .mp3 ``` file format.
 ### User data saving:
-#### last opened directory and volume value is saved so the user doesnt have to set it each time. 
+#### Last opened directory and volume value is saved so the user doesnt have to set it each time. 
 ### Loop function
 ### Autoplay function
 ### Key binds via controlls.
