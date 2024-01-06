@@ -53,7 +53,7 @@ public class FileManager {
                     songs.add(s);
                 }
             } catch (Exception e) {
-                Main.openDialogWindow("Error while loading files.");
+                Main.openDialogWindow("Error while loading files." + (Objects.requireNonNull(dir.list()))[i]);
             }
         }
     }
@@ -84,13 +84,13 @@ public class FileManager {
                 return new Song(file, format, image, name, creator, album, year, genre);
 
             } catch (Exception e) {
-                Main.openDialogWindow("Error while loading metadata.");
+                Main.openDialogWindow("Error while loading metadata." + file.getName());
             }
         } else {
             try {
                 return new Song(file, format, null, file.getName().replace(".wav", ""), "", "", "", "");
             } catch (Exception e) {
-                Main.openDialogWindow("Error while loading metadata.");
+                Main.openDialogWindow("Error while loading metadata." + file.getName());
             }
         }
         return null;

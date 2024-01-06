@@ -107,7 +107,7 @@ public class SongPlayer {
                 return audioFile.getAudioHeader().getTrackLength();
             }
         } catch (Exception e) {
-            Main.openDialogWindow("Player error: song length.");
+            throw new RuntimeException("Can not get song length");
         }
         return 0;
     }

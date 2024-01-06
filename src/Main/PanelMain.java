@@ -3,6 +3,8 @@ package Main;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
@@ -22,10 +24,11 @@ public class PanelMain extends JPanel implements Runnable {
     private final JPanel filePanel = new JPanel();
     private final JSlider timeSlider = new JSlider(0, 0), volumeSlider;
     private final JButton pauseButton = new JButton("Pause"),
-            loopButton = new JButton("Loop (f)"),
-            autoPlayButton = new JButton("Autoplay (f)");
+            loopButton = new JButton("Loop off"),
+            autoPlayButton = new JButton("Autoplay off");
     public BufferedImage defaultCoverImage;
-    private int currentVolume = 50;
+    private int currentVolume = 50, volumeTemp = 0;
+    private boolean muted = false;
     private String currentFilePath = "";
 
     public PanelMain() {
@@ -37,6 +40,54 @@ public class PanelMain extends JPanel implements Runnable {
         setComponents();
         Config.load(this);
         startThread();
+
+        setKeyHandler();
+    }
+
+    private void setKeyHandler() {
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                //retarded java moment
+                char ch = Character.toUpperCase(e.getKeyChar());
+
+                if (e.getKeyCode() == KeyEvent.VK_UP) {
+                    volumeSlider.setValue(getVolume() + 1);
+                    volumeTemp = getVolume();
+                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    volumeSlider.setValue(getVolume() - 1);
+                    volumeTemp = getVolume();
+                } else if (ch == KeyEvent.VK_SPACE) {
+                    if (songPlayer.isReady()) {
+                        if (timeSlider.getValue() == 0 && !songPlayer.isPlaying() && pauseButton.getText().equals("Pause")) {
+                            playButtonFunction();
+                        } else {
+                            pauseButtonFunction();
+                        }
+                    }
+                } else if (ch == KeyEvent.VK_S) {
+                    stopButtonFunction();
+                } else if (ch == KeyEvent.VK_A) {
+                    autoPlayButtonFunction();
+                } else if (ch == KeyEvent.VK_L) {
+                    loopButtonFunction();
+                } else if (ch == KeyEvent.VK_F) {
+                    selectFolderButtonFunction();
+                } else if (ch == KeyEvent.VK_M) {
+                    muted = !muted;
+                    if (muted) {
+                        volumeTemp = getVolume();
+                        volumeSlider.setValue(0);
+                    } else {
+                        volumeSlider.setValue(volumeTemp);
+                    }
+                } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                    switchBackButtonFunction();
+                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    switchNextButtonFunction();
+                }
+            }
+        });
     }
 
     public void startThread() {
@@ -48,7 +99,7 @@ public class PanelMain extends JPanel implements Runnable {
         try {
             defaultCoverImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("musicCoverDefault.png")));
         } catch (IOException e) {
-            Main.openDialogWindow("Cannot load resource.");
+            throw new RuntimeException("cannot load resource");
         }
     }
 
@@ -92,6 +143,7 @@ public class PanelMain extends JPanel implements Runnable {
         Image scaledImage = icon.getImage().getScaledInstance(300, 300, Image.SCALE_DEFAULT);
         imageLabel.setIcon(new ImageIcon(scaledImage));
 
+        timeSlider.setFocusable(false);
         timeSlider.addChangeListener(e -> {
             if (!timeSlider.getValueIsAdjusting()) {
                 if (timeSlider.getValue() != songPlayer.getCurrentSongTime() && songPlayer.isReady()) {
@@ -107,26 +159,36 @@ public class PanelMain extends JPanel implements Runnable {
         this.setBorder(BorderFactory.createLineBorder(this.getBackground(), 5));
 
         JButton fileButton = new JButton("Select folder");
-        fileButton.addActionListener(e -> selectFileButton());
+        fileButton.addActionListener(e -> selectFolderButtonFunction());
+        fileButton.setFocusable(false);
 
         JButton switchButton = new JButton(">>>");
         switchButton.addActionListener(e -> switchNextButtonFunction());
+        switchButton.setFocusable(false);
 
         JButton switchBackButton = new JButton("<<<");
         switchBackButton.addActionListener(e -> switchBackButtonFunction());
+        switchBackButton.setFocusable(false);
 
         JButton playButton = new JButton("Play");
         playButton.addActionListener(e -> playButtonFunction());
+        playButton.setFocusable(false);
 
         pauseButton.addActionListener(e -> pauseButtonFunction());
+        pauseButton.setFocusable(false);
+        pauseButton.setPreferredSize(new Dimension(80, 25));
 
         JButton stopButton = new JButton("Stop");
         stopButton.addActionListener(e -> stopButtonFunction());
+        stopButton.setFocusable(false);
 
         autoPlayButton.addActionListener(e -> autoPlayButtonFunction());
+        autoPlayButton.setFocusable(false);
 
         loopButton.addActionListener(e -> loopButtonFunction());
+        loopButton.setFocusable(false);
 
+        volumeSlider.setFocusable(false);
         volumeSlider.setPaintTicks(true);
         volumeSlider.setPaintLabels(true);
         volumeSlider.setMinorTickSpacing(10);
@@ -238,6 +300,7 @@ public class PanelMain extends JPanel implements Runnable {
 
         for (int i = 0; i < songNames.length; i++) {
             JButton button = new JButton(i + 1 + ". " + songNames[i]);
+            button.setFocusable(false);
             button.setBorder(null);
             button.setBackground(new Color(238, 238, 238));
             button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -283,19 +346,19 @@ public class PanelMain extends JPanel implements Runnable {
 
     private void changeControlButtonLabels() {
         if (songPlayer.isAutoplayEnabled()) {
-            autoPlayButton.setText("Autoplay (t)");
+            autoPlayButton.setText("Autoplay on");
         } else {
-            autoPlayButton.setText("Autoplay (f)");
+            autoPlayButton.setText("Autoplay off");
         }
 
         if (songPlayer.isLoopEnabled()) {
-            loopButton.setText("Loop (t)");
+            loopButton.setText("Loop on");
         } else {
-            loopButton.setText("Loop (f)");
+            loopButton.setText("Loop off");
         }
     }
 
-    private void selectFileButton() {
+    private void selectFolderButtonFunction() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int result = fileChooser.showOpenDialog(null);

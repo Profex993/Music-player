@@ -1,6 +1,5 @@
 package Players;
 
-import Main.Main;
 import Main.Song;
 import Main.SongPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayer;
@@ -57,7 +56,6 @@ public class Mp3Player implements Runnable {
         try {
             player.open(s.file());
         } catch (Exception e) {
-            Main.openDialogWindow("Player error: mp3 set song.");
             throw new RuntimeException(e);
         }
     }
@@ -68,7 +66,6 @@ public class Mp3Player implements Runnable {
             player.setGain(currentVolume);
             currentTime = 0;
         } catch (BasicPlayerException e) {
-            Main.openDialogWindow("Player error: mp3 play.");
             throw new RuntimeException(e);
         }
     }
@@ -78,7 +75,6 @@ public class Mp3Player implements Runnable {
             currentTime = 0;
             player.stop();
         } catch (BasicPlayerException e) {
-            Main.openDialogWindow("Player error: mp3 stop.");
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +83,6 @@ public class Mp3Player implements Runnable {
         try {
             player.pause();
         } catch (BasicPlayerException e) {
-            Main.openDialogWindow("Player error: mp3 pause.");
             throw new RuntimeException(e);
         }
     }
@@ -96,7 +91,6 @@ public class Mp3Player implements Runnable {
         try {
             player.resume();
         } catch (BasicPlayerException e) {
-            Main.openDialogWindow("Player error: mp3 resume.");
             throw new RuntimeException(e);
         }
     }
@@ -116,11 +110,11 @@ public class Mp3Player implements Runnable {
         }
         currentVolume = val;
         try {
-            player.setGain(val);
-        } catch (BasicPlayerException e) {
-            if (!e.getMessage().equals("Gain control not supported")) {
-                Main.openDialogWindow("Error while setting volume.");
+            if (player.hasGainControl()) {
+                player.setGain(val);
             }
+        } catch (BasicPlayerException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -131,7 +125,7 @@ public class Mp3Player implements Runnable {
             player.seek(skipTime);
             player.setGain(currentVolume);
         } catch (BasicPlayerException e) {
-            Main.openDialogWindow("Error while setting time.");
+            throw new RuntimeException(e);
         }
     }
 }

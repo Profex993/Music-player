@@ -1,6 +1,5 @@
 package Players;
 
-import Main.Main;
 import Main.Song;
 import Main.SongPlayer;
 
@@ -53,6 +52,7 @@ public class WavPlayer implements Runnable {
                         play();
                     }
                 } catch (NullPointerException ignored) {
+                    //could be solved by adding if (clip != null) but doesn't work for some reason...
                 }
             }
         }
@@ -67,7 +67,7 @@ public class WavPlayer implements Runnable {
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
         } catch (Exception e) {
-            Main.openDialogWindow("Player error: wav set song.");
+            throw new RuntimeException(e);
         }
     }
 
