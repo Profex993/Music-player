@@ -37,23 +37,22 @@ public class FileManager {
     public void getFiles(ArrayList<Song> songs) {
         File dir = new File(filePath);
         int dirLength = Objects.requireNonNull(dir.list()).length;
+        String[] fileNames = Objects.requireNonNull(dir.list());
         for (int i = 0; i < dirLength; i++) {
             try {
-                String temp = filePath + "/" + (Objects.requireNonNull(dir.list()))[i];
-                Song s = null;
-                if ((Objects.requireNonNull(dir.list()))[i].matches(".*.wav")) {
+                String temp = filePath + "/" + fileNames[i];
+                Song s;
+                if (fileNames[i].matches(".*.wav")) {
                     s = getSong(new File(temp), Format.WAV);
-                } else if ((Objects.requireNonNull(dir.list()))[i].matches(".*.mp3")) {
-                    s = getSong(new File(temp), Format.MP3);
-                } else {
-                    Main.openDialogWindow("Unsupported file: " + Objects.requireNonNull(dir.list())[i]);
-                }
-
-                if (songs != null) {
                     songs.add(s);
+                } else if (fileNames[i].matches(".*.mp3")) {
+                    s = getSong(new File(temp), Format.MP3);
+                    songs.add(s);
+                } else {
+                    Main.openDialogWindow("Unsupported file: " + fileNames[i]);
                 }
             } catch (Exception e) {
-                Main.openDialogWindow("Error while loading files." + (Objects.requireNonNull(dir.list()))[i]);
+                Main.openDialogWindow("Error while loading files." + fileNames[i]);
             }
         }
     }
@@ -86,7 +85,7 @@ public class FileManager {
             } catch (Exception e) {
                 Main.openDialogWindow("Error while loading metadata." + file.getName());
             }
-        } else {
+        } else if (format == Format.WAV) {
             try {
                 return new Song(file, format, null, file.getName().replace(".wav", ""), "", "", "", "");
             } catch (Exception e) {
@@ -99,10 +98,11 @@ public class FileManager {
     public ArrayList<String> getSongNames() {
         File dir = new File(filePath);
         int dirLength = Objects.requireNonNull(dir.list()).length;
+        String[] fileNames = Objects.requireNonNull(dir.list());
         ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < dirLength; i++) {
-            if ((Objects.requireNonNull(dir.list()))[i].matches(".*.wav") || (Objects.requireNonNull(dir.list()))[i].matches(".*.mp3")) {
-                labels.add(Objects.requireNonNull(dir.list())[i] + "\n");
+            if (fileNames[i].matches(".*.wav") || fileNames[i].matches(".*.mp3")) {
+                labels.add(fileNames[i] + "\n");
             }
         }
 
