@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="apache.tika.parser.audiovideo.module" type="repository">
+    <properties maven-id="org.apache.tika:tika-parser-audiovideo-module:2.8.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/tika-parser-audiovideo-module-2.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/metadata-extractor-2.18.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xmpcore-6.1.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
