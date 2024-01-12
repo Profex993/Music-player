@@ -38,5 +38,5 @@ F - chose file
 # Used external libraries:
 - [JavaZoom BasicPlayer](https://github.com/whamtet/BasicPlayer/blob/master/src/javazoom/jlgui/basicplayer/BasicPlayer.java) [download](https://jar-download.com/artifacts/com.googlecode.soundlibs/basicplayer/3.0.0.0/source-code)
 - [Jaudiotagger](https://github.com/marcoc1712/jaudiotagger) [download](https://jar-download.com/artifacts/net.jthink/jaudiotagger/3.0.1/source-code)
-- [Tika Parser 1.4](https://github.com/apache/tika) [download](https://jar-download.com/artifacts/org.apache.tika/tika-app/1.4/source-code](https://repo1.maven.org/maven2/org/apache/tika/tika-parsers/1.4/tika-parsers-1.4.jar)
+- [Tika Parser 1.4](https://github.com/apache/tika) [download](https://repo1.maven.org/maven2/org/apache/tika/tika-parsers/1.4/tika-parsers-1.4.jar)
 - [Tika Core](https://github.com/apache/tika) [download](https://repo1.maven.org/maven2/org/apache/tika/tika-core/1.4/tika-core-1.4.jar)
