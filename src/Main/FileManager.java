@@ -6,7 +6,7 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.datatype.Artwork;
+import org.jaudiotagger.tag.images.Artwork;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.awt.image.BufferedImage;
@@ -77,7 +77,7 @@ public class FileManager {
                 Artwork art = AudioFileIO.read(file).getTag().getFirstArtwork();
                 BufferedImage image = null;
                 if (art != null) {
-                    image = art.getImage();
+                    image = (BufferedImage) art.getImage();
                 }
 
                 return new Song(file, format, image, name, creator, album, year, genre);

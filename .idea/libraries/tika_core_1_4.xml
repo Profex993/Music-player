@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="tika-core-1.4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../lib/metadata/tika-core-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../lib/metadata/tika-parsers-1.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

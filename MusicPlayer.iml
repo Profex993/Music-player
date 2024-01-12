@@ -10,9 +10,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="java" level="project" />
     <orderEntry type="library" name="github.lafa.tikaNoExternal.tika.parsers" level="project" />
-    <orderEntry type="library" name="apache.tika.parser.audiovideo.module" level="project" />
-    <orderEntry type="library" name="googlecode.soundlibs.basicplayer" level="project" />
-    <orderEntry type="library" name="jaudiotagger" level="project" />
-    <orderEntry type="library" name="apache.tika.core" level="project" />
+    <orderEntry type="library" name="jaudiotagger-3.0.1" level="project" />
+    <orderEntry type="library" name="tika-core-1.4" level="project" />
+    <orderEntry type="library" name="mp3" level="project" />
   </component>
 </module>

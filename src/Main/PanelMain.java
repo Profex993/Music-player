@@ -6,8 +6,8 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class PanelMain extends JPanel implements Runnable {
     private Thread thread;
@@ -43,7 +43,7 @@ public class PanelMain extends JPanel implements Runnable {
 
     private void getResource() {
         try {
-            defaultCoverImage = ImageIO.read(new File("res/musicCoverDefault.png"));
+            defaultCoverImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("images/musicCoverDefault.png")));
         } catch (IOException e) {
             throw new RuntimeException("cannot load resource");
         }
