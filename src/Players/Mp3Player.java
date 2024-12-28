@@ -33,16 +33,14 @@ public class Mp3Player implements Runnable {
             last = time;
             if (timer >= 1000000000) {
                 timer = 0;
-                if ((player.getStatus() == BasicPlayer.PLAYING) || player.getStatus() == BasicPlayer.STOPPED
-                        && (songPlayer.isAutoplayEnabled() || songPlayer.isLoopEnabled()) &&
-                        currentTime < songPlayer.getSongLength() + 2) {
+                if ((player.getStatus() == BasicPlayer.PLAYING || player.getStatus() == BasicPlayer.SEEKING)) {
                     currentTime++;
-                } else if (currentTime == songPlayer.getSongLength() + 2 && songPlayer.isAutoplayEnabled()) {
+                } else if (currentTime >= songPlayer.getSongLength() - 3 && songPlayer.isAutoplayEnabled()) {
                     currentTime = 0;
                     songPlayer.getPanelMain().resetTime();
                     songPlayer.switchSongNext();
                     songPlayer.getPanelMain().setCurrentSongLabels();
-                } else if (currentTime == songPlayer.getSongLength() + 2 && songPlayer.isLoopEnabled()) {
+                } else if (currentTime >= songPlayer.getSongLength() - 3 && songPlayer.isLoopEnabled()) {
                     currentTime = 0;
                     songPlayer.getPanelMain().resetTime();
 
@@ -55,6 +53,7 @@ public class Mp3Player implements Runnable {
     public void setSong(Song s) {
         try {
             player.open(s.file());
+            currentTime = 0;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

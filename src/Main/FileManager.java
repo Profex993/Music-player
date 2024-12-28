@@ -49,7 +49,9 @@ public class FileManager {
                     s = getSong(new File(temp), Format.MP3);
                     songs.add(s);
                 } else {
-                    Main.openDialogWindow("Unsupported file: " + fileNames[i]);
+                    if (!(fileNames[i].matches(".*.jpg") || fileNames[i].matches(".*.png"))) {
+                        Main.openDialogWindow("Unsupported file: " + fileNames[i]);
+                    }
                 }
             } catch (Exception e) {
                 Main.openDialogWindow("Error while loading files." + fileNames[i]);

@@ -37,15 +37,14 @@ public class WavPlayer implements Runnable {
             if (timer >= 1000000000) {
                 timer = 0;
                 try {
-                    if (isRunning() || !isRunning() && (songPlayer.isAutoplayEnabled() || songPlayer.isLoopEnabled()) &&
-                            currentTime < songPlayer.getSongLength() + 2) {
+                    if (isRunning() && currentTime < songPlayer.getSongLength()) {
                         currentTime++;
-                    } else if (currentTime == songPlayer.getSongLength() + 2 && songPlayer.isAutoplayEnabled()) {
+                    } else if (currentTime >= songPlayer.getSongLength() - 3 && songPlayer.isAutoplayEnabled()) {
                         currentTime = 0;
                         songPlayer.getPanelMain().resetTime();
                         songPlayer.switchSongNext();
                         songPlayer.getPanelMain().setCurrentSongLabels();
-                    } else if (currentTime == songPlayer.getSongLength() + 2 && songPlayer.isLoopEnabled()) {
+                    } else if (currentTime >= songPlayer.getSongLength() - 3 && songPlayer.isLoopEnabled()) {
                         currentTime = 0;
                         songPlayer.getPanelMain().resetTime();
                         setTime(0);
@@ -66,6 +65,7 @@ public class WavPlayer implements Runnable {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(song.file().toURI().toURL());
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
+            currentTime = 0;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
